@@ -1,4 +1,5 @@
 import cloudinary from "../lib/cloudinary.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 
@@ -56,7 +57,13 @@ export const sendMessage = async (req, res) => {
 
         await newMessage.save();
 
-        // real time message delivery will come here => socket.io
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if (receiverSocketId) {
+            // emit takes method name and and the data to send. emit is used to broadcast or send a message
+            // here before emit, to() is used, which means this emit will be applicable to only that particular socket id
+            // If there is only emit, it means it will be applicable to all the socket ids, that has been used in onlineUsers  
+            io.to(receiverSocketId).emit("newMessage", newMessage) // "newMessage" is the method name and 2nd arg - data
+        }
 
         res.status(201).json(newMessage)
 

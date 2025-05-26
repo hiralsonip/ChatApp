@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import { axiosInstace } from "../lib/axios"
 import toast from "react-hot-toast"
+import { useAuthStore } from "./useAuthStore"
 
 export const useChatStore = create((set, get) => ({
     messages: [],
@@ -43,6 +44,21 @@ export const useChatStore = create((set, get) => ({
             console.log("Error in sendMesage funtion in useChatStore - ", error.message);
             toast.error(error.response.data.message)
         }
+    },
+
+    // receive the message in realtime  
+    subscribeToMessages: () => {
+        const { selectedUser } = get();
+        if (!selectedUser) return;
+
+        const socket = useAuthStore.getState().socket;
+        socket.on("newMessage", (newMessage) => { set({ messages: [...get().messages, newMessage] }) })
+    },
+
+    // When we close the chat window or at the time of logout 
+    unsubscribeFromMessages: () => {
+        const socket = useAuthStore.getState().socket;
+        socket.off("newMessage")
     },
 
     // todo : Optimize this one later
