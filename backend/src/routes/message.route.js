@@ -8,4 +8,6 @@ router.get("/users", protectRoute, getUsersForSidebar);
 router.get("/:id", protectRoute, getMessages);
 router.post("/send/:id", protectRoute, sendMessage)
 
+console.log("Loading message.routes.js");
+
 export default router;

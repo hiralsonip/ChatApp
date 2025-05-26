@@ -10,4 +10,6 @@ router.post("/logout", logout);
 router.put("/update-profile", protectRoute, updateProfile);
 router.get("/check", protectRoute, checkAuth)
 
+console.log("Loading auth.routes.js");
+
 export default router;
