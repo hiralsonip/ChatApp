@@ -52,7 +52,11 @@ export const useChatStore = create((set, get) => ({
         if (!selectedUser) return;
 
         const socket = useAuthStore.getState().socket;
-        socket.on("newMessage", (newMessage) => { set({ messages: [...get().messages, newMessage] }) })
+        socket.on("newMessage", (newMessage) => {
+            const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
+            if (!isMessageSentFromSelectedUser) return;
+            set({ messages: [...get().messages, newMessage] })
+        })
     },
 
     // When we close the chat window or at the time of logout 
@@ -61,6 +65,5 @@ export const useChatStore = create((set, get) => ({
         socket.off("newMessage")
     },
 
-    // todo : Optimize this one later
     setSelectedUser: (selectedUser) => set({ selectedUser })
 }))

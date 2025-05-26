@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import SidebarSkeleton from './skeleton/SidebarSkeleton';
 import { Users } from 'lucide-react';
@@ -9,10 +9,16 @@ const Sidebar = () => {
     const { users, getUsers, setSelectedUser, isUsersLoading, selectedUser } = useChatStore();
 
     const { onlineUsers } = useAuthStore();
+    const [showOnlineOnly, setShowOnlineOnly] = useState(false)
 
     useEffect(() => {
         getUsers()
     }, [getUsers])
+
+    const handleOnlineUsersToggle = () => {
+        setShowOnlineOnly(!showOnlineOnly);
+    }
+    const filteredUsers = showOnlineOnly ? users.filter(user => onlineUsers.includes(user._id)) : users;
 
     if (isUsersLoading) return <SidebarSkeleton />
 
@@ -30,9 +36,17 @@ const Sidebar = () => {
                 {/* Todo : online filter toggel */}
             </div>
 
+            <fieldset className="fieldset  w-64  p-4">
+                <label className="label">
+                    <input type="checkbox" className="toggle toggle-success" onChange={() => handleOnlineUsersToggle()} />
+                    Show online only <span className='text-xs text-zinc-500'>({onlineUsers.length - 1} online)</span>
+                </label>
+
+            </fieldset>
+
             {/* Users section */}
             <div className='overflow-y-auto w-full py-3'>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                     <button
                         key={user?._id}
                         onClick={() => setSelectedUser(user)}
@@ -58,11 +72,14 @@ const Sidebar = () => {
                                 {onlineUsers.includes(user._id) ? "Online" : "Offline"}
                             </div>
                         </div>
-
                     </button>
                 ))}
+
+                {filteredUsers.length === 0 && (
+                    <div className='text-center text-zinc-500 py-4'>No online users</div>
+                )}
             </div>
-        </aside >
+        </aside>
     )
 }
 
