@@ -8,6 +8,7 @@ export const useAuthStore = create((set) => ({
     isLoggingIn: false,
     isUpdatingProfile: false,
     isCheckingAuth: true,
+    onlineUsers: [],
 
     checkAuth: async () => {
         try {
@@ -24,7 +25,7 @@ export const useAuthStore = create((set) => ({
     signup: async (data) => {
         set({ isSigningUp: true })
         try {
-            await axiosInstace.post("/auth/signup", data)
+            const res = await axiosInstace.post("/auth/signup", data)
             toast.success("Account created successfully")
             set({ authUser: res.data })
         } catch (error) {
